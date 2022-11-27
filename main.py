@@ -1,1 +1,1 @@
-﻿print('Yoru')
+print('Yoru')
