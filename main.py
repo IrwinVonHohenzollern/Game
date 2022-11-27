@@ -1,1 +1,1 @@
-﻿print('Ilya')
+﻿print('Yoru')
