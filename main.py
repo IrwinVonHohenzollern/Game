@@ -22,14 +22,14 @@ class Pricel(pygame.sprite.Sprite):
         self.rect.center = pygame.mouse.get_pos()
 
 
-class projectile(object):
+class Projectile(object):
     def __init__(self, vel, x, y):
         self.x = x
         self.y = y
         self.vel = vel
 
-    def draw(self, win):
-        pygame.draw.rect(screen, (0, 0, 0))
+    def draw(self):
+        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 10, 10))
 
 
 class Hero:
@@ -44,37 +44,51 @@ class Hero:
 bullets = []
 hero = Hero(WIDTH // 2, HEIGHT - 50)
 
+a = Pricel()
+player_group = pygame.sprite.Group()
+player_group.add(a)
+
 
 def draw():
+    screen.fill((255, 255, 255))
     hero.draw()
 
+    for bullet in bullets:
+        bullet.draw()
+
+    player_group.draw(screen)
+    player_group.update()
+
+
     pygame.display.flip()
+
     pygame.display.update()
+
+    clock.tick(FPS)
 
 
 while True:
     keys = pygame.key.get_pressed()
-    screen.fill((255, 255, 255))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if len(bullets) < 5:
+                    bullets.append(
+                        Projectile(10, hero.x + 20 // 2, hero.y + 40 // 2))
 
     for bullet in bullets:
-        if bullet.y < 0:
+        if bullet.y < 0 or bullet.y < 0 or bullet.x > WIDTH or bullet.y > HEIGHT:
             bullets.pop(bullets.index(bullet))
         else:
-            bullet.x += bullet.vel
+            bullet.y -= bullet.vel
+            print(1)
 
     if keys[pygame.K_a] and hero.x > 0: hero.x -= 3
     if keys[pygame.K_d] and hero.x < WIDTH - 30: hero.x += 3
     if keys[pygame.K_w] and hero.y > 0: hero.y -= 3
     if keys[pygame.K_s] and hero.y < HEIGHT - 40: hero.y += 3
 
-
-    hero.draw()
-
-    pygame.display.update()
-
-    clock.tick(FPS)
-
+    draw()
