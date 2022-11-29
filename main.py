@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, math
 
 WIDTH = 800
 HEIGHT = 800
@@ -11,15 +11,11 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 screen.fill((255, 255, 255))
 
 
-class Pricel(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image = pygame.Surface((10, 10))
-        self.image.fill((255, 0, 0))
-        self.rect = self.image.get_rect(center=(WIDTH // 2, HEIGHT - 10))
+class Pricel():
 
-    def update(self):
-        self.rect.center = pygame.mouse.get_pos()
+    def draw(self):
+        self.x, self.y = pygame.mouse.get_pos()
+        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 10, 10))
 
 
 class Projectile(object):
@@ -27,6 +23,12 @@ class Projectile(object):
         self.x = x
         self.y = y
         self.vel = vel
+        distance_x = a.x - hero.x
+        distance_y = a.y - hero.y
+        angle = math.atan2(distance_y, distance_x)
+        self.speed_x = math.cos(angle) * self.vel
+        self.speed_y = math.sin(angle) * self.vel
+
 
     def draw(self):
         pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 10, 10))
@@ -45,8 +47,6 @@ bullets = []
 hero = Hero(WIDTH // 2, HEIGHT - 50)
 
 a = Pricel()
-player_group = pygame.sprite.Group()
-player_group.add(a)
 
 
 def draw():
@@ -56,8 +56,7 @@ def draw():
     for bullet in bullets:
         bullet.draw()
 
-    player_group.draw(screen)
-    player_group.update()
+    a.draw()
 
 
     pygame.display.flip()
@@ -74,6 +73,7 @@ while True:
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
+
             if event.button == 1:
                 if len(bullets) < 5:
                     bullets.append(
@@ -83,8 +83,13 @@ while True:
         if bullet.y < 0 or bullet.y < 0 or bullet.x > WIDTH or bullet.y > HEIGHT:
             bullets.pop(bullets.index(bullet))
         else:
-            bullet.y -= bullet.vel
-            print(1)
+            # distance_x = a.x - hero.x  Управляемая стрельба
+            # distance_y = a.y - hero.y
+            # angle = math.atan2(distance_y, distance_x)
+            # bullet.x += bullet.vel * math.cos(angle)
+            # bullet.y += bullet.vel * math.sin(angle)
+            bullet.x += bullet.speed_x
+            bullet.y += bullet.speed_y
 
     if keys[pygame.K_a] and hero.x > 0: hero.x -= 3
     if keys[pygame.K_d] and hero.x < WIDTH - 30: hero.x += 3
@@ -92,3 +97,5 @@ while True:
     if keys[pygame.K_s] and hero.y < HEIGHT - 40: hero.y += 3
 
     draw()
+
+
