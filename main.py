@@ -4,17 +4,26 @@ import pygame
 import sys
 import math
 
+import spritesheet
+
 WIDTH = 800
 HEIGHT = 800
 FPS = 60
+
+BLACK = (0, 0, 0)
 
 pygame.init()
 pygame.mixer.init()
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-screen.fill((255, 255, 255))
+screen.fill((50, 50, 50))
+pygame.display.set_caption('Spritesheets')
 
+sprite_sheet_idle = pygame.image.load('sprites/idle.png').convert_alpha()
+sprite_sheet_walk = pygame.image.load('sprites/walk.png').convert_alpha()
+show_idle = spritesheet.Spritesheet(sprite_sheet_idle)
+show_walk = spritesheet.Spritesheet(sprite_sheet_walk)
 
 class Pricel():
 
@@ -32,8 +41,8 @@ class Projectile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
-        self.distance_x = pricel.x - hero.rect.x
-        self.distance_y = pricel.y - hero.rect.y
+        self.distance_x = pricel.x - hero.rect.x + (30 // 2)
+        self.distance_y = pricel.y - hero.rect.y + (40 // 2)
 
         # distance_x = a.x - hero.x  Управляемая стрельба
         # distance_y = a.y - hero.y
@@ -50,29 +59,47 @@ class Projectile(pygame.sprite.Sprite):
             self.kill()
 
 
-
 class Hero(pygame.sprite.Sprite):
     def __init__(self, speedx, speedy):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((30, 40))
-        self.image.fill((255, 0, 0))
         self.rect = self.image.get_rect()
         self.speedx = speedx
         self.speedy = speedy
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 10
+        self.update_time = pygame.time.get_ticks()
+        self.frame_index = 0
+        self.animation_list = []
+        self.last_coords = self.rect
+        self.action = 0  # 0-idle, 1-walking
 
     def update(self):
+        animation_cooldown = 100
+        if pygame.time.get_ticks() - self.update_time >= animation_cooldown:
+            self.update_time = pygame.time.get_ticks()
+            self.frame_index += 1
+            if self.frame_index >= len(self.animation_list[self.action]):
+                self.frame_index = 0
         btn = pygame.key.get_pressed()
-        if btn[pygame.K_a] and self.rect.x > 0: self.rect.x -= self.speedx
-        if btn[pygame.K_d] and self.rect.x < WIDTH - 30: self.rect.x += self.speedx
-        if btn[pygame.K_w] and self.rect.y > 0: self.rect.y -= self.speedy
-        if btn[pygame.K_s] and self.rect.y < HEIGHT - 40: self.rect.y += self.speedy
+        if btn[pygame.K_a] and self.rect.x > 0:
+            self.rect.x -= self.speedx
+        if btn[pygame.K_d] and self.rect.x < WIDTH - 30:
+            self.rect.x += self.speedx
+        if btn[pygame.K_w] and self.rect.y > 0:
+            self.rect.y -= self.speedy
+        if btn[pygame.K_s] and self.rect.y < HEIGHT - 40:
+            self.rect.y += self.speedy
+        # if self.last_coords == self.rect:
+        #     self.animation_list = idle_list
 
     def shoot(self):
         bullet = Projectile(10, self.rect.x + 20 // 2, self.rect.y + 40 // 2)
         all_sprites.add(bullet)
         bullets.add(bullet)
+
+    def draw(self):
+        screen.blit(self.animation_list[self.action][self.frame_index], (self.rect.x, self.rect.y))
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -85,14 +112,27 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.bottom = random.randint(20, HEIGHT - 20)
 
 
+def get_animation(list_of_sheet, width, height, destroy_bg, num_of_sprite):
+    animation_list = []
+    step_counter = 0
+    for animation in range(1, num_of_sprite + 1):  # количество спрайтов в листе
+        animation_list.append(list_of_sheet.get_image(step_counter, width, height, 1, destroy_bg))
+        step_counter += 1
+    return animation_list
+
+
+idle_list = get_animation(show_idle, 128, 128, BLACK, 6)
+walk_list = get_animation(show_walk, 128, 128, BLACK, 6)
 hero = Hero(3, 3)
+hero.animation_list.append(idle_list)
+hero.animation_list.append(walk_list)
 
 enemies = []
 
 pricel = Pricel()
 
 all_sprites = pygame.sprite.Group()
-all_sprites.add(hero)
+# all_sprites.add(hero)
 
 bullets = pygame.sprite.Group()
 
@@ -101,16 +141,28 @@ mobs = pygame.sprite.Group()
 
 while True:
     clock.tick(FPS)
-
+    screen.fill((50, 50, 50))
     keys = pygame.key.get_pressed()
+
+    # update animation
+    # current_time = pygame.time.get_ticks()
+    # if current_time - last_update >= animation_cooldown:
+    #     frame += 1
+    #     last_update = current_time
+    #     if frame >= len(idle_list):
+    #         frame = 0
+    #
+    # if counter_hero_animation == 0:
+    #     screen.blit(idle_list[frame], (0, 0))
+    # elif counter_hero_animation == 1:
+    #     screen.blit(walk_list[frame], (0, 0))
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             hero.shoot()
-
-
         if event.type == pygame.KEYDOWN and event.key == pygame.K_j:
             enemy = Enemy()
             all_sprites.add(enemy)
@@ -120,148 +172,12 @@ while True:
 
     hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
 
-
-    screen.fill((255, 255, 255))
     pricel.draw()
+    hero.update()
+    hero.draw()
 
     all_sprites.draw(screen)
 
     pygame.display.flip()
 
 
-# KidsCanCode - Game Development with Pygame video series
-# Shmup game - part 3
-# Video link: https://www.youtube.com/watch?v=33g62PpFwsE
-# Collisions and bullets
-# import pygame
-# import random
-#
-# WIDTH = 480
-# HEIGHT = 600
-# FPS = 60
-#
-# # define colors
-# WHITE = (255, 255, 255)
-# BLACK = (0, 0, 0)
-# RED = (255, 0, 0)
-# GREEN = (0, 255, 0)
-# BLUE = (0, 0, 255)
-# YELLOW = (255, 255, 0)
-#
-# # initialize pygame and create window
-# pygame.init()
-# pygame.mixer.init()
-# screen = pygame.display.set_mode((WIDTH, HEIGHT))
-# pygame.display.set_caption("Shmup!")
-# clock = pygame.time.Clock()
-#
-# class Player(pygame.sprite.Sprite):
-#     def __init__(self):
-#         pygame.sprite.Sprite.__init__(self)
-#         self.image = pygame.Surface((50, 40))
-#         self.image.fill(GREEN)
-#         self.rect = self.image.get_rect()
-#         self.rect.centerx = WIDTH / 2
-#         self.rect.bottom = HEIGHT - 10
-#         self.speedx = 0
-#
-#     def update(self):
-#         self.speedx = 0
-#         keystate = pygame.key.get_pressed()
-#         if keystate[pygame.K_LEFT]:
-#             self.speedx = -8
-#         if keystate[pygame.K_RIGHT]:
-#             self.speedx = 8
-#         self.rect.x += self.speedx
-#         if self.rect.right > WIDTH:
-#             self.rect.right = WIDTH
-#         if self.rect.left < 0:
-#             self.rect.left = 0
-#
-#     def shoot(self):
-#         bullet = Bullet(self.rect.centerx, self.rect.top)
-#         all_sprites.add(bullet)
-#         bullets.add(bullet)
-#
-# class Mob(pygame.sprite.Sprite):
-#     def __init__(self):
-#         pygame.sprite.Sprite.__init__(self)
-#         self.image = pygame.Surface((30, 40))
-#         self.image.fill(RED)
-#         self.rect = self.image.get_rect()
-#         self.rect.x = random.randrange(WIDTH - self.rect.width)
-#         self.rect.y = random.randrange(-100, -40)
-#         self.speedy = random.randrange(1, 8)
-#         self.speedx = random.randrange(-3, 3)
-#
-#     def update(self):
-#         self.rect.x += self.speedx
-#         self.rect.y += self.speedy
-#         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
-#             self.rect.x = random.randrange(WIDTH - self.rect.width)
-#             self.rect.y = random.randrange(-100, -40)
-#             self.speedy = random.randrange(1, 8)
-#
-# class Bullet(pygame.sprite.Sprite):
-#     def __init__(self, x, y):
-#         pygame.sprite.Sprite.__init__(self)
-#         self.image = pygame.Surface((10, 20))
-#         self.image.fill(YELLOW)
-#         self.rect = self.image.get_rect()
-#         self.rect.bottom = y
-#         self.rect.centerx = x
-#         self.speedy = -10
-#
-#     def update(self):
-#         self.rect.y += self.speedy
-#         # kill if it moves off the top of the screen
-#         if self.rect.bottom < 0:
-#             self.kill()
-#
-# all_sprites = pygame.sprite.Group()
-# mobs = pygame.sprite.Group()
-# bullets = pygame.sprite.Group()
-# player = Player()
-# all_sprites.add(player)
-# for i in range(8):
-#     m = Mob()
-#     all_sprites.add(m)
-#     mobs.add(m)
-#
-# # Game loop
-# running = True
-# while running:
-#     # keep loop running at the right speed
-#     clock.tick(FPS)
-#     # Process input (events)
-#     for event in pygame.event.get():
-#         # check for closing window
-#         if event.type == pygame.QUIT:
-#             running = False
-#         elif event.type == pygame.KEYDOWN:
-#             if event.key == pygame.K_SPACE:
-#                 player.shoot()
-#
-#     # Update
-#     all_sprites.update()
-#
-#     # check to see if a bullet hit a mob
-#     hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
-#     for hit in hits:
-#         print(hits)
-#         # m = Mob()
-#         # all_sprites.add(m)
-#         # mobs.add(m)
-#
-#     # check to see if a mob hit the player
-#     hits = pygame.sprite.spritecollide(player, mobs, False)
-#     if hits:
-#         running = False
-#
-#     # Draw / render
-#     screen.fill(BLACK)
-#     all_sprites.draw(screen)
-#     # *after* drawing everything, flip the display
-#     pygame.display.flip()
-#
-# pygame.quit()
