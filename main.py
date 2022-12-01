@@ -5,6 +5,7 @@ import sys
 import math
 
 import spritesheet
+from pygame import mixer
 
 WIDTH = 800
 HEIGHT = 800
@@ -13,36 +14,64 @@ FPS = 60
 BLACK = (0, 0, 0)
 
 pygame.init()
+
 pygame.mixer.init()
+mixer.init()
+mixer.music.load('music/stranger-things-124008.mp3')
+mixer.music.set_volume(0.2)
+mixer.music.play(-1)
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 screen.fill((50, 50, 50))
 pygame.display.set_caption('Spritesheets')
 
+pygame.mouse.set_visible(False)
+
 sprite_sheet_idle = pygame.image.load('sprites/idle.png').convert_alpha()
 sprite_sheet_walk = pygame.image.load('sprites/walk.png').convert_alpha()
 show_idle = spritesheet.Spritesheet(sprite_sheet_idle)
 show_walk = spritesheet.Spritesheet(sprite_sheet_walk)
 
-class Pricel():
 
-    def draw(self):
-        self.x, self.y = pygame.mouse.get_pos()
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 10, 10))
+
+# TEST
+
+class Aim(pygame.sprite.Sprite):
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('sprites/target_20.png').convert_alpha()
+        self.rect = self.image.get_rect()
+        self.image = pygame.transform.scale(self.image, (512 * 0.08, 512 * 0.08))
+        self.image.set_colorkey(BLACK)
+
+
+    def update(self):
+        self.rect.x = pygame.mouse.get_pos()[0] - 20
+        self.rect.y = pygame.mouse.get_pos()[1] - 20
 
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, vel, x, y):
+    def __init__(self, vel, x, y, direction_x, direction_y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((5, 5))
         self.image.fill((255, 0, 0))
         self.vel = vel
         self.rect = self.image.get_rect()
-        self.rect.centerx = x
-        self.rect.bottom = y
-        self.distance_x = pricel.x - hero.rect.x + (30 // 2)
-        self.distance_y = pricel.y - hero.rect.y + (40 // 2)
+
+        self.rect.x = x
+        self.rect.y = y
+
+        self.float_x = x
+        self.float_y = y
+
+        x_diff = direction_x - x
+        y_diff = direction_y - y
+        angle = math.atan2(y_diff, x_diff)
+
+        self.change_x = math.cos(angle) * vel
+        self.change_y = math.sin(angle) * vel
 
         # distance_x = a.x - hero.x  Управляемая стрельба
         # distance_y = a.y - hero.y
@@ -52,54 +81,72 @@ class Projectile(pygame.sprite.Sprite):
 
     def update(self):
 
-        angle = math.atan2(self.distance_y, self.distance_x)
-        self.rect.x += math.cos(angle) * self.vel
-        self.rect.y += math.sin(angle) * self.vel
+        self.float_y += self.change_y
+        self.float_x += self.change_x
+
+        self.rect.x = int(self.float_x)
+        self.rect.y = int(self.float_y)
+
         if self.rect.x < 0 or self.rect.x > WIDTH or self.rect.y < 0 or self.rect.y > HEIGHT:
             self.kill()
 
 
 class Hero(pygame.sprite.Sprite):
-    def __init__(self, speedx, speedy):
+    def __init__(self, speedx, speedy, facing):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 40))
-        self.rect = self.image.get_rect()
         self.speedx = speedx
         self.speedy = speedy
-        self.rect.centerx = WIDTH / 2
-        self.rect.bottom = HEIGHT - 10
         self.update_time = pygame.time.get_ticks()
         self.frame_index = 0
         self.animation_list = []
-        self.last_coords = self.rect
+        self.animation_list.append(idle_list)
+        self.animation_list.append(walk_list)
         self.action = 0  # 0-idle, 1-walking
+        self.image = self.animation_list[self.action][self.frame_index]
+        self.rect = self.image.get_rect()
+        self.last_coords = self.rect
+        self.rect.centerx = WIDTH / 2
+        self.rect.bottom = HEIGHT - 10
+        self.facing = 0  # 0 -right, 1-left
 
     def update(self):
         animation_cooldown = 100
+        if self.facing:
+            self.image = pygame.transform.flip(self.animation_list[self.action][self.frame_index], True, False)
+            self.image.set_colorkey(BLACK)
+        else:
+            self.image = self.animation_list[self.action][self.frame_index]
+        self.action = 0
         if pygame.time.get_ticks() - self.update_time >= animation_cooldown:
             self.update_time = pygame.time.get_ticks()
             self.frame_index += 1
             if self.frame_index >= len(self.animation_list[self.action]):
                 self.frame_index = 0
+
         btn = pygame.key.get_pressed()
+
         if btn[pygame.K_a] and self.rect.x > 0:
             self.rect.x -= self.speedx
+            self.action = 1
+            self.facing = 0
         if btn[pygame.K_d] and self.rect.x < WIDTH - 30:
             self.rect.x += self.speedx
+            self.action = 1
+            self.facing = 1
         if btn[pygame.K_w] and self.rect.y > 0:
             self.rect.y -= self.speedy
+            self.action = 1
         if btn[pygame.K_s] and self.rect.y < HEIGHT - 40:
             self.rect.y += self.speedy
-        # if self.last_coords == self.rect:
-        #     self.animation_list = idle_list
+            self.action = 1
 
     def shoot(self):
-        bullet = Projectile(10, self.rect.x + 20 // 2, self.rect.y + 40 // 2)
+        pos = pygame.mouse.get_pos()
+        mouse_x = pos[0]
+        mouse_y = pos[1]
+        bullet = Projectile(10, self.rect.x, self.rect.y, mouse_x, mouse_y)
         all_sprites.add(bullet)
         bullets.add(bullet)
-
-    def draw(self):
-        screen.blit(self.animation_list[self.action][self.frame_index], (self.rect.x, self.rect.y))
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -123,17 +170,19 @@ def get_animation(list_of_sheet, width, height, destroy_bg, num_of_sprite):
 
 idle_list = get_animation(show_idle, 128, 128, BLACK, 6)
 walk_list = get_animation(show_walk, 128, 128, BLACK, 6)
-hero = Hero(3, 3)
-hero.animation_list.append(idle_list)
-hero.animation_list.append(walk_list)
+hero = Hero(3, 3, 0)
+
 
 enemies = []
 
-pricel = Pricel()
+aim = Aim()
 
 all_sprites = pygame.sprite.Group()
-# all_sprites.add(hero)
+all_sprites.add(hero)
+all_sprites.add(aim)
 
+my_sprites = []
+my_sprites.append(hero)
 bullets = pygame.sprite.Group()
 
 mobs = pygame.sprite.Group()
@@ -144,18 +193,8 @@ while True:
     screen.fill((50, 50, 50))
     keys = pygame.key.get_pressed()
 
-    # update animation
-    # current_time = pygame.time.get_ticks()
-    # if current_time - last_update >= animation_cooldown:
-    #     frame += 1
-    #     last_update = current_time
-    #     if frame >= len(idle_list):
-    #         frame = 0
-    #
-    # if counter_hero_animation == 0:
-    #     screen.blit(idle_list[frame], (0, 0))
-    # elif counter_hero_animation == 1:
-    #     screen.blit(walk_list[frame], (0, 0))
+
+    # TEST
 
 
     for event in pygame.event.get():
@@ -169,13 +208,7 @@ while True:
             mobs.add(enemy)
 
     all_sprites.update()
-
-    hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
-
-    pricel.draw()
-    hero.update()
-    hero.draw()
-
+    pygame.sprite.groupcollide(mobs, bullets, True, True)
     all_sprites.draw(screen)
 
     pygame.display.flip()
