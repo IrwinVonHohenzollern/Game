@@ -6,36 +6,65 @@ import math
 
 import spritesheet
 from pygame import mixer
-
-WIDTH = 800
-HEIGHT = 800
-FPS = 60
+from settings import *
+from level import Level
 
 BLACK = (0, 0, 0)
 
-pygame.init()
-
-pygame.mixer.init()
-mixer.init()
-mixer.music.load('music/stranger-things-124008.mp3')
-mixer.music.set_volume(0.2)
-mixer.music.play(-1)
-
-clock = pygame.time.Clock()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-screen.fill((50, 50, 50))
-pygame.display.set_caption('Spritesheets')
-
-pygame.mouse.set_visible(False)
-
-sprite_sheet_idle = pygame.image.load('sprites/idle.png').convert_alpha()
-sprite_sheet_walk = pygame.image.load('sprites/walk.png').convert_alpha()
-show_idle = spritesheet.Spritesheet(sprite_sheet_idle)
-show_walk = spritesheet.Spritesheet(sprite_sheet_walk)
-
-
-
 # TEST
+class Game:
+    def __init__(self):
+        self.level = Level()
+
+        pygame.init()
+
+        pygame.mixer.init()
+        mixer.init()
+        mixer.music.load('music/stranger-things-124008.mp3')
+        mixer.music.set_volume(0.2)
+        mixer.music.play(-1)
+
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.screen.fill((50, 50, 50))
+        pygame.display.set_caption('Spritesheets')
+
+        pygame.mouse.set_visible(False)
+
+        self.sprite_sheet_idle = pygame.image.load('sprites/idle.png').convert_alpha()
+        self.sprite_sheet_walk = pygame.image.load('sprites/walk.png').convert_alpha()
+        self.show_idle = spritesheet.Spritesheet(self.sprite_sheet_idle)
+        self.show_walk = spritesheet.Spritesheet(self.sprite_sheet_walk)
+
+    def run(self):
+        while True:
+            self.clock.tick(FPS)
+            self.screen.fill((50, 50, 50))
+
+            # TEST
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    hero.shoot()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_j:
+                    enemy = Enemy()
+                    all_sprites.add(enemy)
+                    mobs.add(enemy)
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                    sys.exit()
+            all_sprites.update()
+            pygame.sprite.groupcollide(mobs, bullets, True, True)
+            all_sprites.draw(self.screen)
+
+            pygame.display.flip()
+
+
+            # self.screen.fill('black')
+            # self.level.run()
+            # pygame.display.update()
+            # self.clock.tick(FPS)
 
 class Aim(pygame.sprite.Sprite):
 
@@ -159,17 +188,17 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.bottom = random.randint(20, HEIGHT - 20)
 
 
-def get_animation(list_of_sheet, width, height, destroy_bg, num_of_sprite):
+def get_animation(list_of_sheet, width, height, destroy_bg, num_of_sprite, scale):
     animation_list = []
     step_counter = 0
     for animation in range(1, num_of_sprite + 1):  # количество спрайтов в листе
-        animation_list.append(list_of_sheet.get_image(step_counter, width, height, 1, destroy_bg))
+        animation_list.append(list_of_sheet.get_image(step_counter, width, height, scale, destroy_bg))
         step_counter += 1
     return animation_list
 
-
-idle_list = get_animation(show_idle, 128, 128, BLACK, 6)
-walk_list = get_animation(show_walk, 128, 128, BLACK, 6)
+game = Game()
+idle_list = get_animation(game.show_idle, 128, 128, BLACK, 6, 0.5)
+walk_list = get_animation(game.show_walk, 128, 128, BLACK, 6, 0.5)
 hero = Hero(3, 3, 0)
 
 
@@ -187,30 +216,5 @@ bullets = pygame.sprite.Group()
 
 mobs = pygame.sprite.Group()
 
-
-while True:
-    clock.tick(FPS)
-    screen.fill((50, 50, 50))
-    keys = pygame.key.get_pressed()
-
-
-    # TEST
-
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            hero.shoot()
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_j:
-            enemy = Enemy()
-            all_sprites.add(enemy)
-            mobs.add(enemy)
-
-    all_sprites.update()
-    pygame.sprite.groupcollide(mobs, bullets, True, True)
-    all_sprites.draw(screen)
-
-    pygame.display.flip()
-
-
+if __name__ == '__main__':
+    game.run()
