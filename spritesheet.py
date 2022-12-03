@@ -11,3 +11,12 @@ class Spritesheet():
         image.set_colorkey(colour)
 
         return image
+
+
+def get_animation(list_of_sheet, width, height, destroy_bg, num_of_sprite, scale):
+    animation_list = []
+    step_counter = 0
+    for animation in range(1, num_of_sprite + 1):  # количество спрайтов в листе
+        animation_list.append(list_of_sheet.get_image(step_counter, width, height, scale, destroy_bg))
+        step_counter += 1
+    return animation_list
