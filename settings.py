@@ -1,5 +1,7 @@
-WIDTH = 1280
-HEIGHT = 720
+import ctypes
+
+
+WIDTH, HEIGHT = tuple(map(lambda x: ctypes.windll.user32.GetSystemMetrics(x) // 2, (0, 1)))
 FPS = 60
 TILESIZE = 64
 
@@ -20,4 +22,11 @@ WORLD_MAP = [
      ['x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'],
      ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x']
 ]
+
+WORLD_MAP1 = []
+for i in range(18):
+    lst = []
+    for j in range(32):
+        lst.append('x')
+    WORLD_MAP1.append(lst)
 

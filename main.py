@@ -14,7 +14,7 @@ BLACK = (0, 0, 0)
 # TEST
 class Game:
     def __init__(self):
-        self.level = Level()
+
 
         pygame.init()
 
@@ -35,6 +35,7 @@ class Game:
         self.sprite_sheet_walk = pygame.image.load('sprites/walk.png').convert_alpha()
         self.show_idle = spritesheet.Spritesheet(self.sprite_sheet_idle)
         self.show_walk = spritesheet.Spritesheet(self.sprite_sheet_walk)
+        self.level = Level(self.screen)
 
     def run(self):
         while True:
@@ -46,14 +47,17 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    hero.shoot()
+                # if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                #     hero.shoot()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_j:
                     enemy = Enemy()
                     all_sprites.add(enemy)
                     mobs.add(enemy)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit()
+
+
+            self.level.run()
             all_sprites.update()
             pygame.sprite.groupcollide(mobs, bullets, True, True)
             all_sprites.draw(self.screen)
@@ -137,6 +141,7 @@ class Hero(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 10
         self.facing = 0  # 0 -right, 1-left
+        self.shoot_time = pygame.time.get_ticks()
 
     def update(self):
         animation_cooldown = 100
@@ -154,6 +159,8 @@ class Hero(pygame.sprite.Sprite):
 
         btn = pygame.key.get_pressed()
 
+
+
         if btn[pygame.K_a] and self.rect.x > 0:
             self.rect.x -= self.speedx
             self.action = 1
@@ -168,6 +175,10 @@ class Hero(pygame.sprite.Sprite):
         if btn[pygame.K_s] and self.rect.y < HEIGHT - 40:
             self.rect.y += self.speedy
             self.action = 1
+        if pygame.time.get_ticks() - self.shoot_time >= 500:
+            self.shoot_time = pygame.time.get_ticks()
+            if pygame.mouse.get_pressed()[0]:
+                self.shoot()
 
     def shoot(self):
         pos = pygame.mouse.get_pos()
@@ -197,8 +208,8 @@ def get_animation(list_of_sheet, width, height, destroy_bg, num_of_sprite, scale
     return animation_list
 
 game = Game()
-idle_list = get_animation(game.show_idle, 128, 128, BLACK, 6, 0.5)
-walk_list = get_animation(game.show_walk, 128, 128, BLACK, 6, 0.5)
+idle_list = get_animation(game.show_idle, 128, 128, BLACK, 6, 2)
+walk_list = get_animation(game.show_walk, 128, 128, BLACK, 6, 2)
 hero = Hero(3, 3, 0)
 
 
