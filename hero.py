@@ -102,11 +102,10 @@ class Aim(pygame.sprite.Sprite):
         self.x, self.y = x, y
 
     def update(self):
-        self.rect.x = pygame.mouse.get_pos()[0] - 20
-        self.rect.y = pygame.mouse.get_pos()[1] - 20
+        pos = pygame.mouse.get_pos()
+        self.rect.x = pos[0] - 20
+        self.rect.y = pos[1] - 20
 
-    def draw(self):
-        screen.blit(self.image, self.rect)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 sprite_sheet_idle = pygame.image.load('sprites/idle.png').convert_alpha()

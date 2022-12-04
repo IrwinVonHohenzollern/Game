@@ -26,8 +26,6 @@ class Level:
     def run(self):
         self.visible_sprites.update()
 
-        self.aim.update()
-        self.aim.draw()
         self.visible_sprites.custom_draw(self.hero)
 
 
@@ -49,7 +47,7 @@ class Level:
                     self.hero = Hero(3, 3, 0, self.visible_sprites, self.bullets, self.tiles, x + 100, y + 100, self.aim)
 
                     # self.all_sprites.add(self.hero)
-                    # self.all_sprites.add(aim)
+                    self.visible_sprites.add(self.aim)
                     self.visible_sprites.add(self.hero)
 
 
