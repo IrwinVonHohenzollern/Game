@@ -11,6 +11,7 @@ class Projectile(pygame.sprite.Sprite):
         self.vel = vel
         self.rect = self.image.get_rect()
 
+
         self.rect.x = x
         self.rect.y = y
 
@@ -38,5 +39,5 @@ class Projectile(pygame.sprite.Sprite):
         self.rect.x = int(self.float_x)
         self.rect.y = int(self.float_y)
 
-        if self.rect.x < 0 or self.rect.x > WIDTH or self.rect.y < 0 or self.rect.y > HEIGHT:
-            self.kill()
+        # if self.rect.x < 0 or self.rect.x > WIDTH or self.rect.y < 0 or self.rect.y > HEIGHT:
+        #     self.kill()

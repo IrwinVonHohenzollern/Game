@@ -7,7 +7,7 @@ BLACK = (0, 0, 0)
 pygame.init()
 
 class Hero(pygame.sprite.Sprite):
-    def __init__(self, speedx, speedy, facing, all_sprites, bullets, tiles, x, y):
+    def __init__(self, speedx, speedy, facing, all_sprites, bullets, tiles, x, y, aim):
         pygame.sprite.Sprite.__init__(self)
         self.speedx = speedx
         self.speedy = speedy
@@ -27,6 +27,7 @@ class Hero(pygame.sprite.Sprite):
         self.tiles = tiles
         self.rect.centerx = x
         self.rect.bottom = y
+        self.aim = aim
 
     def update(self):
         animation_cooldown = 100
@@ -49,26 +50,30 @@ class Hero(pygame.sprite.Sprite):
 
 
 
-        if btn[pygame.K_a] and self.rect.x > 0:
+        if btn[pygame.K_a]:
             self.rect.x -= self.speedx
             self.action = 1
             self.facing = 0
+            self.aim.rect.x -= self.speedx
             if pygame.sprite.spritecollide(self, self.tiles, False):
                 self.rect.x += self.speedx
-        if btn[pygame.K_d] and self.rect.x < WIDTH - 30:
+        if btn[pygame.K_d]:
             self.rect.x += self.speedx
             self.action = 1
             self.facing = 1
+            self.aim.rect.x += self.speedx
             if pygame.sprite.spritecollide(self, self.tiles, False):
                 self.rect.x -= self.speedx
-        if btn[pygame.K_w] and self.rect.y > 0:
+        if btn[pygame.K_w]:
             self.rect.y -= self.speedy
             self.action = 1
+            self.aim.rect.y -= self.speedy
             if pygame.sprite.spritecollide(self, self.tiles, False):
                 self.rect.y += self.speedy
-        if btn[pygame.K_s] and self.rect.y < HEIGHT - 40:
+        if btn[pygame.K_s]:
             self.rect.y += self.speedy
             self.action = 1
+            self.aim.rect.y += self.speedy
             if pygame.sprite.spritecollide(self, self.tiles, False):
                 self.rect.y -= self.speedy
         if pygame.time.get_ticks() - self.shoot_time >= 250:
@@ -83,28 +88,31 @@ class Hero(pygame.sprite.Sprite):
         bullet = Projectile(10, self.rect.x, self.rect.y, mouse_x, mouse_y)
         group_of_sprite.add(bullet)
         bullets_sprite.add(bullet)
+        print(pos)
 
 
 class Aim(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load('sprites/target_20.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.image = pygame.transform.scale(self.image, (512 * 0.08, 512 * 0.08))
         self.image.set_colorkey(BLACK)
-
+        self.x, self.y = x, y
 
     def update(self):
         self.rect.x = pygame.mouse.get_pos()[0] - 20
         self.rect.y = pygame.mouse.get_pos()[1] - 20
 
+    def draw(self):
+        screen.blit(self.image, self.rect)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 sprite_sheet_idle = pygame.image.load('sprites/idle.png').convert_alpha()
 sprite_sheet_walk = pygame.image.load('sprites/walk.png').convert_alpha()
 show_idle = spritesheet.Spritesheet(sprite_sheet_idle)
 show_walk = spritesheet.Spritesheet(sprite_sheet_walk)
-idle_list = spritesheet.get_animation(show_idle, 128, 128, BLACK, 6, 1)
-walk_list = spritesheet.get_animation(show_walk, 128, 128, BLACK, 6, 1)
+idle_list = spritesheet.get_animation(show_idle, 128, 128, BLACK, 6, 0.2)
+walk_list = spritesheet.get_animation(show_walk, 128, 128, BLACK, 6, 0.2)
 bullets = pygame.sprite.Group()

@@ -5,6 +5,8 @@ import sys
 from pygame import mixer
 from settings import *
 from level import Level
+# from camera import *
+
 
 
 BLACK = (0, 0, 0)
@@ -26,11 +28,14 @@ class Game:
         self.screen.fill((50, 50, 50))
         pygame.display.set_caption('Spritesheets')
 
-        pygame.mouse.set_visible(False)
+        pygame.mouse.set_visible(True)
 
 
         self.level = Level(self.screen)
-        self.all_sprites = self.level.all_sprites
+
+        # self.camera = Camera(self.level.hero)
+        # follow = Follow(self.camera, self.level.hero)
+        # self.camera.setmethod(follow)
 
     def run(self):
         while True:
@@ -44,7 +49,6 @@ class Game:
                     sys.exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_j:
                     enemy = Enemy()
-                    self.all_sprites.add(enemy)
                     # mobs.add(enemy)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit()
@@ -52,10 +56,10 @@ class Game:
 
             self.level.run()
 
-            self.all_sprites.update()
+            # self.camera.scroll()
             # pygame.sprite.groupcollide(mobs, bullets, True, True)
 
-            self.all_sprites.draw(self.screen)
+            # self.all_sprites.draw(self.screen)
 
             pygame.display.flip()
 
