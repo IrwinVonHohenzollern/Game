@@ -28,7 +28,7 @@ class Game:
         self.screen.fill((50, 50, 50))
         pygame.display.set_caption('Spritesheets')
 
-        pygame.mouse.set_visible(True)
+        pygame.mouse.set_visible(False)
 
 
         self.level = Level(self.screen)
