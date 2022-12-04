@@ -105,8 +105,8 @@ class Aim(pygame.sprite.Sprite):
 
     def update(self):
         pos = pygame.mouse.get_pos()
-        self.rect.x = pos[0] - 20 - 188
-        self.rect.y = pos[1] - 20 + 9
+        self.rect.x = pos[0] - 20 + self.x
+        self.rect.y = pos[1] - 20 + self.y
 
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))

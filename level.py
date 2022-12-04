@@ -43,8 +43,13 @@ class Level:
                     self.tiles.add(tile)
                     self.visible_sprites.add(tile)
                 elif col == 'p':
+                    self.half_width = self.display_surface.get_size()[0] // 2
+                    self.half_height = self.display_surface.get_size()[1] // 2
+
                     self.aim = Aim(0, 0)
                     self.hero = Hero(3, 3, 0, self.visible_sprites, self.bullets, self.tiles, x + 100, y + 100, self.aim)
+                    self.aim.x = self.hero.rect.centerx - self.half_width
+                    self.aim.y = self.hero.rect.centery - self.half_height
 
                     # self.all_sprites.add(self.hero)
                     self.visible_sprites.add(self.aim)
