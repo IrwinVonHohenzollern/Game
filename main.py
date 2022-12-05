@@ -28,7 +28,11 @@ class Game:
         self.screen.fill((50, 50, 50))
         pygame.display.set_caption('Spritesheets')
 
+        bg_img = pygame.image.load('sprites/bg.png').convert_alpha()
+        self.bg = pygame.transform.scale(bg_img, (WIDTH, HEIGHT))
+
         pygame.mouse.set_visible(True)
+
 
 
         self.level = Level(self.screen)
@@ -38,6 +42,7 @@ class Game:
         # self.camera.setmethod(follow)
 
     def run(self):
+        i = 0
         while True:
             self.clock.tick(FPS)
             self.screen.fill((50, 50, 50))
@@ -53,7 +58,12 @@ class Game:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit()
 
-
+            self.screen.blit(self.bg, (0, i))
+            self.screen.blit(self.bg, (0, HEIGHT + i))
+            if i == -HEIGHT:
+                self.screen.blit(self.bg, (0, HEIGHT+i))
+                i = 0
+            i -= 1
             self.level.run()
 
             # self.camera.scroll()

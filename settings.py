@@ -31,10 +31,4 @@ WORLD_MAP = [
     ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
 ]
 
-WORLD_MAP1 = []
-for i in range(18):
-    lst = []
-    for j in range(32):
-        lst.append('x')
-    WORLD_MAP1.append(lst)
 

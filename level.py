@@ -18,13 +18,18 @@ class Level:
         self.all_sprites = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
         self.tiles = pygame.sprite.Group()
+        self.earth = Earth()
+        self.earth.rect.x = 100
+        self.earth.rect.y = 100
 
         self.create_map()
         self.screen = screen
 
 
+
     def run(self):
         self.visible_sprites.update()
+        pygame.sprite.groupcollide(self.bullets, self.tiles, True, False)
 
         self.visible_sprites.custom_draw(self.hero)
 
@@ -34,6 +39,7 @@ class Level:
 
 
     def create_map(self):
+        self.visible_sprites.add(self.earth)
         for row_index, row in enumerate(WORLD_MAP):
             for col_index, col in enumerate(row):
                 x = col_index * TILESIZE
@@ -79,3 +85,11 @@ class Camera(pygame.sprite.Group):
             else:
                 offset_position = sprite.rect.topleft - self.offset
                 self.display_surface.blit(sprite.image, offset_position)
+
+
+class Earth(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load('sprites/earth.jpg').convert_alpha()
+        self.rect = self.image.get_rect()
+        self.image = pygame.transform.scale(self.image, (len(WORLD_MAP[0]) * TILESIZE, len(WORLD_MAP) * TILESIZE))
