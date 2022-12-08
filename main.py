@@ -5,6 +5,7 @@ import sys
 from pygame import mixer
 from settings import *
 from level import Level
+from hero import Expload
 # from camera import *
 
 
@@ -32,17 +33,22 @@ class Game:
         self.bg = pygame.transform.scale(bg_img, (WIDTH, HEIGHT))
 
         pygame.mouse.set_visible(True)
+        self.fire = []
 
 
 
         self.level = Level(self.screen)
+        self.level.visible_sprites.add()
 
         # self.camera = Camera(self.level.hero)
         # follow = Follow(self.camera, self.level.hero)
         # self.camera.setmethod(follow)
 
+
     def run(self):
         i = 0
+        value = 0
+
         while True:
             self.clock.tick(FPS)
             self.screen.fill((50, 50, 50))
@@ -57,6 +63,10 @@ class Game:
                     # mobs.add(enemy)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    ex = Expload(self.level.hero.rect.x, self.level.hero.rect.y, 10, self.level.aim.rect.x, self.level.aim.rect.y)
+                    self.level.visible_sprites.add(ex)
+
 
             self.screen.blit(self.bg, (0, i))
             self.screen.blit(self.bg, (0, HEIGHT + i))
@@ -65,6 +75,7 @@ class Game:
                 i = 0
             i -= 1
             self.level.run()
+
 
             # self.camera.scroll()
             # pygame.sprite.groupcollide(mobs, bullets, True, True)
