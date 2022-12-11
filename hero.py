@@ -32,6 +32,7 @@ class Hero(pygame.sprite.Sprite):
         self.help_x = 0
         self.help_y = 0
 
+
     def update(self):
         animation_cooldown = 100
         if not self.facing:
@@ -50,8 +51,6 @@ class Hero(pygame.sprite.Sprite):
 
         # if pygame.sprite.spritecollide(hero, self.level.visible_sprites, False):
         #     pygame.sprite.spritecollide(hero, self.level.visible_sprites, False)
-
-
 
         if btn[pygame.K_a]:
             self.rect.x -= self.speedx
@@ -90,10 +89,12 @@ class Hero(pygame.sprite.Sprite):
 
     def shoot(self, group_of_sprite, bullets_sprite):
         if self.facing:
-            bullet = Projectile(10, self.rect.x + self.rect.w * 0.9, self.rect.y, self.aim.rect.x + self.help_x + 20, self.aim.rect.y + self.help_y + 20, fire_bullet)
+            bullet = Projectile(10, self.rect.x + self.rect.w * 0.9 - self.rect.x * 0.1, self.rect.y,
+                                self.aim.rect.x + self.help_x - self.aim.rect.x * 0.02, self.aim.rect.y + self.help_y -
+                                self.aim.rect.y * 0.02, fire_bullet)
         else:
-            bullet = Projectile(10, self.rect.x, self.rect.y, self.aim.rect.x + self.help_x + 20,
-                                self.aim.rect.y + self.help_y + 20, fire_bullet)
+            bullet = Projectile(10, self.rect.x, self.rect.y, self.aim.rect.x + self.help_x + self.aim.rect.x * 0.02,
+                                self.aim.rect.y + self.help_y + self.aim.rect.y * 0.02, fire_bullet)
         group_of_sprite.add(bullet)
         bullets_sprite.add(bullet)
 
@@ -124,7 +125,6 @@ class Expload(pygame.sprite.Sprite):
         self.vel = vel
         self.rect = self.image.get_rect()
         self.update_time = pygame.time.get_ticks()
-
 
         self.rect.x = x
         self.rect.y = y
@@ -180,5 +180,3 @@ for i in range(12):
     img = pygame.transform.scale(img, (img.get_rect()[2] * 0.15, img.get_rect()[3] * 0.15))
     img.set_colorkey(BLACK)
     fire_bullet.append(img)
-
-print(fire_bullet)

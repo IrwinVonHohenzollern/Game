@@ -3,6 +3,7 @@ import pygame
 from settings import *
 from tile import Tile
 from hero import Hero, Aim
+from helth_bar import Bar
 
 
 
@@ -22,16 +23,21 @@ class Level:
         self.earth.rect.x = 100
         self.earth.rect.y = 100
 
+
         self.create_map()
         self.screen = screen
+
 
 
 
     def run(self):
         self.visible_sprites.update()
         pygame.sprite.groupcollide(self.bullets, self.tiles, True, False)
+        # self.bar.draw(self.hero.rect.x, self.hero.rect.y)
+
 
         self.visible_sprites.custom_draw(self.hero)
+        self.bar.draw(WIDTH * 0.01, HEIGHT * 0.01, self.screen)
 
 
         # self.all_sprites.update()
@@ -60,7 +66,7 @@ class Level:
                     # self.all_sprites.add(self.hero)
                     self.visible_sprites.add(self.aim)
                     self.visible_sprites.add(self.hero)
-
+                    self.bar = Bar()
 
 
 class Camera(pygame.sprite.Group):
