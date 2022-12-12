@@ -7,11 +7,15 @@ pygame.init()
 class Bar(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image =
-        self.rect = self.image.get_rect()
+
+
         self.sprites = []
         for i in range(16):
-            self.sprites.append(pygame.image.load(f'sprites/healthbar/Health bar{i}.png').convert_alpha())
+            img = pygame.image.load(f'sprites/healthbar/Health bar{i}.png').convert_alpha()
+            img = pygame.transform.scale(img, (WIDTH * 0.2, HEIGHT * 0.1))
+            self.sprites.append(img)
+        self.image = self.sprites[15]
+        self.rect = self.image.get_rect()
 
 
     def draw(self, x, y, screen):

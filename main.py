@@ -7,6 +7,7 @@ from settings import *
 from level import Level
 from hero import Expload
 # from camera import *
+from enemies import Enemy
 
 
 
@@ -58,14 +59,14 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_j:
-                    enemy = Enemy()
-                    # mobs.add(enemy)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                    ex = Expload(self.level.hero.rect.x, self.level.hero.rect.y, 10, self.level.aim.rect.x, self.level.aim.rect.y)
-                    self.level.visible_sprites.add(ex)
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    print(1)
+                    enemy = Enemy(self.level.hero.rect.x, self.level.hero.rect.y)
+                    self.level.visible_sprites.add(enemy)
+                    self.level.enemies.add(enemy)
+
 
 
             self.screen.blit(self.bg, (0, i))
@@ -84,16 +85,6 @@ class Game:
 
             pygame.display.flip()
 
-
-
-class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 40))
-        self.image.fill((0, 0, 255))
-        self.rect = self.image.get_rect()
-        self.rect.centerx = random.randint(20, WIDTH - 20)
-        self.rect.bottom = random.randint(20, HEIGHT - 20)
 
 if __name__ == '__main__':
     game = Game()

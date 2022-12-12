@@ -4,6 +4,7 @@ from settings import *
 from tile import Tile
 from hero import Hero, Aim
 from helth_bar import Bar
+from enemies import Enemy
 
 
 
@@ -22,6 +23,7 @@ class Level:
         self.earth = Earth()
         self.earth.rect.x = 100
         self.earth.rect.y = 100
+        self.enemies = pygame.sprite.Group()
 
 
         self.create_map()
@@ -34,6 +36,7 @@ class Level:
         self.visible_sprites.update()
         pygame.sprite.groupcollide(self.bullets, self.tiles, True, False)
         # self.bar.draw(self.hero.rect.x, self.hero.rect.y)
+        pygame.sprite.groupcollide(self.bullets, self.enemies, True, True)
 
 
         self.visible_sprites.custom_draw(self.hero)
@@ -67,6 +70,10 @@ class Level:
                     self.visible_sprites.add(self.aim)
                     self.visible_sprites.add(self.hero)
                     self.bar = Bar()
+                elif col == 'e':
+                    enemy = Enemy(x + 100, y + 100)
+                    self.visible_sprites.add(enemy)
+                    self.enemies.add(enemy)
 
 
 class Camera(pygame.sprite.Group):
