@@ -24,6 +24,7 @@ class Level:
         self.earth.rect.x = 100
         self.earth.rect.y = 100
         self.enemies = pygame.sprite.Group()
+        self.enemies_lst = []
 
 
         self.create_map()
@@ -36,7 +37,14 @@ class Level:
         self.visible_sprites.update()
         pygame.sprite.groupcollide(self.bullets, self.tiles, True, False)
         # self.bar.draw(self.hero.rect.x, self.hero.rect.y)
-        pygame.sprite.groupcollide(self.bullets, self.enemies, True, True)
+        # if pygame.sprite.groupcollide(self.bullets, self.enemies, True, False):
+        for i in pygame.sprite.groupcollide(self.bullets, self.enemies, True, False).items():
+            i[1][0].hp -= 100
+
+
+
+        for i in self.enemies_lst:
+            i.updater(self.hero.rect.x + self.hero.rect.w // 2, self.hero.rect.y + self.hero.rect.h // 2)
 
 
         self.visible_sprites.custom_draw(self.hero)
@@ -71,9 +79,8 @@ class Level:
                     self.visible_sprites.add(self.hero)
                     self.bar = Bar()
                 elif col == 'e':
-                    enemy = Enemy(x + 100, y + 100)
+                    enemy = Enemy(x + 100, y + 100, self.enemies, self.enemies_lst)
                     self.visible_sprites.add(enemy)
-                    self.enemies.add(enemy)
 
 
 class Camera(pygame.sprite.Group):

@@ -82,10 +82,11 @@ class Hero(pygame.sprite.Sprite):
             if pygame.sprite.spritecollide(self, self.tiles, False):
                 self.rect.y -= self.speedy
                 self.help_y -= self.speedy
-        if pygame.time.get_ticks() - self.shoot_time >= 250:
-            self.shoot_time = pygame.time.get_ticks()
-            if pygame.mouse.get_pressed()[0]:
+
+        if pygame.mouse.get_pressed()[0]:
+            if pygame.time.get_ticks() - self.shoot_time >= 250:
                 self.shoot(self.all_sprites, self.bullets)
+                self.shoot_time = pygame.time.get_ticks()
 
     def shoot(self, group_of_sprite, bullets_sprite):
         if self.facing:

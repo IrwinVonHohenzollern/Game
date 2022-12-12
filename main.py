@@ -36,10 +36,9 @@ class Game:
         pygame.mouse.set_visible(True)
         self.fire = []
 
-
-
         self.level = Level(self.screen)
         self.level.visible_sprites.add()
+        self.shoot_time = pygame.time.get_ticks()
 
         # self.camera = Camera(self.level.hero)
         # follow = Follow(self.camera, self.level.hero)
@@ -48,7 +47,7 @@ class Game:
 
     def run(self):
         i = 0
-        value = 0
+        shooting = False
 
         while True:
             self.clock.tick(FPS)
@@ -62,12 +61,10 @@ class Game:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    print(1)
                     enemy = Enemy(self.level.hero.rect.x, self.level.hero.rect.y)
                     self.level.visible_sprites.add(enemy)
                     self.level.enemies.add(enemy)
-
-
+                    self.level.enemies_lst.append(enemy)
 
             self.screen.blit(self.bg, (0, i))
             self.screen.blit(self.bg, (0, HEIGHT + i))
