@@ -170,9 +170,9 @@ show_idle = spritesheet.Spritesheet(sprite_sheet_idle)
 show_walk = spritesheet.Spritesheet(sprite_sheet_walk)
 show_explode = spritesheet.Spritesheet(sprite_explode)
 
-idle_list = spritesheet.get_animation(show_idle, 64, 128, BLACK, 9, 1)
-walk_list = spritesheet.get_animation(show_walk, 64, 128, BLACK, 9, 1)
-explode_list = spritesheet.get_animation(show_explode, 128, 128, (17, 0, 19), 6, 2)
+idle_list = spritesheet.get_animation(show_idle, 64, 128, BLACK, 9, 1, 0)
+walk_list = spritesheet.get_animation(show_walk, 64, 128, BLACK, 9, 1, 0)
+explode_list = spritesheet.get_animation(show_explode, 128, 128, (17, 0, 19), 6, 2, 0)
 bullets = pygame.sprite.Group()
 
 fire_bullet = []

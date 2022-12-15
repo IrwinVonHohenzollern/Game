@@ -61,7 +61,7 @@ class Game:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    enemy = Enemy(self.level.hero.rect.x, self.level.hero.rect.y)
+                    enemy = Enemy(self.level.hero.rect.x, self.level.hero.rect.y, self.level.enemies, self.level.enemies_lst)
                     self.level.visible_sprites.add(enemy)
                     self.level.enemies.add(enemy)
                     self.level.enemies_lst.append(enemy)

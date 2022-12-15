@@ -4,7 +4,7 @@ from settings import *
 from tile import Tile
 from hero import Hero, Aim
 from helth_bar import Bar
-from enemies import Enemy
+from enemies import Enemy, Golem
 
 
 
@@ -37,9 +37,11 @@ class Level:
         self.visible_sprites.update()
         pygame.sprite.groupcollide(self.bullets, self.tiles, True, False)
         # self.bar.draw(self.hero.rect.x, self.hero.rect.y)
-        # if pygame.sprite.groupcollide(self.bullets, self.enemies, True, False):
-        for i in pygame.sprite.groupcollide(self.bullets, self.enemies, True, False).items():
-            i[1][0].hp -= 100
+        if pygame.sprite.groupcollide(self.bullets, self.enemies, True, True):
+            print(self.enemy.rect)
+
+        # for i in pygame.sprite.groupcollide(self.bullets, self.enemies, True, False).items():
+        #     i[1][0].hp -= 100
 
 
 
@@ -79,8 +81,8 @@ class Level:
                     self.visible_sprites.add(self.hero)
                     self.bar = Bar()
                 elif col == 'e':
-                    enemy = Enemy(x + 100, y + 100, self.enemies, self.enemies_lst)
-                    self.visible_sprites.add(enemy)
+                    self.enemy = Golem(x + 100, y + 100, self.enemies, self.enemies_lst)
+                    self.visible_sprites.add(self.enemy)
 
 
 class Camera(pygame.sprite.Group):
