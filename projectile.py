@@ -4,7 +4,7 @@ from settings import *
 
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, vel, x, y, direction_x, direction_y, sprite_list=None):
+    def __init__(self, vel, x, y, direction_x, direction_y, sprite_list=None, rotate=360):
         pygame.sprite.Sprite.__init__(self)
         self.lst = sprite_list[::]
         if self.lst is not None:
@@ -16,6 +16,7 @@ class Projectile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.frame_index = 0
         self.update_time = pygame.time.get_ticks()
+        self.rotate = rotate
 
 
 
@@ -30,7 +31,7 @@ class Projectile(pygame.sprite.Sprite):
 
         self.angle = math.atan2(y_diff, x_diff)
         for i in range(len(self.lst)):
-            self.lst[i] = pygame.transform.rotate(self.lst[i], 90)
+            self.lst[i] = pygame.transform.rotate(self.lst[i], self.rotate)
             self.lst[i] = pygame.transform.rotate(self.lst[i], (360 - self.angle * 180 / math.pi) % 360)
             self.lst[i].set_colorkey((0, 0, 0))
 

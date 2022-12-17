@@ -26,24 +26,21 @@ class Level:
         self.enemies = pygame.sprite.Group()
         self.enemies_lst = []
 
-
+        self.golem_bullets = pygame.sprite.Group()
         self.create_map()
         self.screen = screen
 
 
-
-
     def run(self):
         self.visible_sprites.update()
+
+        # Destroy bullets-tiles
         pygame.sprite.groupcollide(self.bullets, self.tiles, True, False)
-        # self.bar.draw(self.hero.rect.x, self.hero.rect.y)
-        if pygame.sprite.groupcollide(self.bullets, self.enemies, True, True):
-            print(self.enemy.rect)
 
-        # for i in pygame.sprite.groupcollide(self.bullets, self.enemies, True, False).items():
-        #     i[1][0].hp -= 100
+        pygame.sprite.groupcollide(self.golem_bullets, self.tiles, True, False)
 
-
+        for i in pygame.sprite.groupcollide(self.bullets, self.enemies, True, False).items():
+            i[1][0].hp -= self.hero.damage
 
         for i in self.enemies_lst:
             i.updater(self.hero.rect.x + self.hero.rect.w // 2, self.hero.rect.y + self.hero.rect.h // 2)
@@ -81,7 +78,7 @@ class Level:
                     self.visible_sprites.add(self.hero)
                     self.bar = Bar()
                 elif col == 'e':
-                    self.enemy = Golem(x + 100, y + 100, self.enemies, self.enemies_lst)
+                    self.enemy = Golem(x + 100, y + 100, self.enemies, self.enemies_lst, self.visible_sprites, self.golem_bullets)
                     self.visible_sprites.add(self.enemy)
 
 

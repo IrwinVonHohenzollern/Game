@@ -5,7 +5,6 @@ import sys
 from pygame import mixer
 from settings import *
 from level import Level
-from hero import Expload
 # from camera import *
 from enemies import Enemy
 

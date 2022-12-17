@@ -31,6 +31,7 @@ class Hero(pygame.sprite.Sprite):
         self.aim = aim
         self.help_x = 0
         self.help_y = 0
+        self.damage = 10
 
 
     def update(self):
@@ -92,10 +93,10 @@ class Hero(pygame.sprite.Sprite):
         if self.facing:
             bullet = Projectile(10, self.rect.x + self.rect.w * 0.9 - self.rect.x * 0.1, self.rect.y,
                                 self.aim.rect.x + self.help_x - self.aim.rect.x * 0.02, self.aim.rect.y + self.help_y -
-                                self.aim.rect.y * 0.02, fire_bullet)
+                                self.aim.rect.y * 0.02, fire_bullet, 90)
         else:
             bullet = Projectile(10, self.rect.x, self.rect.y, self.aim.rect.x + self.help_x + self.aim.rect.x * 0.02,
-                                self.aim.rect.y + self.help_y + self.aim.rect.y * 0.02, fire_bullet)
+                                self.aim.rect.y + self.help_y + self.aim.rect.y * 0.02, fire_bullet, 90)
         group_of_sprite.add(bullet)
         bullets_sprite.add(bullet)
 
@@ -115,64 +116,17 @@ class Aim(pygame.sprite.Sprite):
         self.rect.x = pos[0] - 20 + self.x
         self.rect.y = pos[1] - 20 + self.y
 
-
-class Expload(pygame.sprite.Sprite):
-    def __init__(self, x, y, vel, direction_x, direction_y):
-        pygame.sprite.Sprite.__init__(self)
-        self.animation_list = []
-        self.animation_list.extend(explode_list)
-        self.image = self.animation_list[0]
-        self.rect = self.image.get_rect()
-        self.vel = vel
-        self.rect = self.image.get_rect()
-        self.update_time = pygame.time.get_ticks()
-
-        self.rect.x = x
-        self.rect.y = y
-
-        self.float_x = x
-        self.float_y = y
-
-        x_diff = direction_x - x
-        y_diff = direction_y - y
-        angle = math.atan2(y_diff, x_diff)
-
-        self.change_x = math.cos(angle) * vel
-        self.change_y = math.sin(angle) * vel
-        self.frame_index = 0
-
-    def update(self):
-        self.float_y += self.change_y
-        self.float_x += self.change_x
-
-        self.rect.x = int(self.float_x)
-        self.rect.y = int(self.float_y)
-
-        animation_cooldown = 100
-
-        self.image = self.animation_list[self.frame_index]
-        if pygame.time.get_ticks() - self.update_time >= animation_cooldown:
-            self.update_time = pygame.time.get_ticks()
-            self.frame_index += 1
-            if self.frame_index >= len(self.animation_list):
-                self.kill()
-
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 sprite_sheet_idle = pygame.image.load('sprites/mage.png').convert_alpha()
 sprite_sheet_walk = pygame.image.load('sprites/mage.png').convert_alpha()
-sprite_explode = pygame.image.load('sprites/expload.jpg').convert_alpha()
 
-sprite_explode = pygame.transform.scale(sprite_explode, (768, 128))
 
 show_idle = spritesheet.Spritesheet(sprite_sheet_idle)
 show_walk = spritesheet.Spritesheet(sprite_sheet_walk)
-show_explode = spritesheet.Spritesheet(sprite_explode)
 
 idle_list = spritesheet.get_animation(show_idle, 64, 128, BLACK, 9, 1, 0)
 walk_list = spritesheet.get_animation(show_walk, 64, 128, BLACK, 9, 1, 0)
-explode_list = spritesheet.get_animation(show_explode, 128, 128, (17, 0, 19), 6, 2, 0)
 bullets = pygame.sprite.Group()
 
 fire_bullet = []
