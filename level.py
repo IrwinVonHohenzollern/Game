@@ -49,7 +49,7 @@ class Level:
             i[1][0].hp -= self.hero.damage
 
         for i in self.enemies_lst:
-            i.updater(self.hero.rect.x + self.hero.rect.w // 2, self.hero.rect.y + self.hero.rect.h // 2)
+            i.updater(self.hero.rect.x + self.hero.rect.width // 2, self.hero.rect.y + self.hero.rect.height // 2)
 
 
         self.visible_sprites.custom_draw(self.hero)

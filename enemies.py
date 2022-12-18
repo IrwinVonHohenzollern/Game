@@ -98,11 +98,7 @@ class Golem(Enemy):
         self.strike_laser = False
 
     def updater(self, direction_x, direction_y):
-
-        try:
-            super().updater(direction_x, direction_y)
-        except Exception:
-            print(self.action, self.frame_index)
+        super().updater(direction_x, direction_y)
         if pygame.time.get_ticks() - self.laser_time >= 5000 and self.action != 2 and not self.shooting:
             self.shooting = False
             self.moving = False
@@ -155,9 +151,21 @@ class Golem(Enemy):
 
     def shoot_laser(self, vel, direction_x, direction_y, sprite_list, bullets_type):
         # bullet = Projectile(vel, self.rect.x, self.rect.y, direction_x, direction_y, sprite_list)
-        bullet = Projectile(vel, self.rect.x, self.rect.y + self.rect.y * 0.1, direction_x, direction_y - self.rect.y * 0.1, sprite_list)
-        self.all_sprites.add(bullet)
+        bullet = Projectile(vel, self.rect.x, self.rect.y + self.rect.y * 0.1, direction_x, direction_y, sprite_list)
         bullets_type.add(bullet)
+        self.all_sprites.add(bullet)
+        # bullet = Projectile(vel, self.rect.x, self.rect.y + self.rect.y * 0.1, self.rect.x + 10, self.rect.y,
+        #                     sprite_list)
+        # bullets_type.add(bullet)
+        # self.all_sprites.add(bullet)
+        # bullet = Projectile(vel, self.rect.x, self.rect.y + self.rect.y * 0.1, self.rect.x, self.rect.y + self.rect.y * 0.1 + 10,
+        #                     sprite_list)
+        # bullets_type.add(bullet)
+        # self.all_sprites.add(bullet)
+        # bullet = Projectile(vel, self.rect.x, self.rect.y + self.rect.y * 0.1, self.rect.x, self.rect.y + self.rect.y * 0.1 + 10 - 10,
+        #                     sprite_list)
+        # self.all_sprites.add(bullet)
+        # bullets_type.add(bullet)
         return bullet
 
 
