@@ -79,7 +79,7 @@ class Enemy(pygame.sprite.Sprite):
 
 class Golem(Enemy):
 
-    def __init__(self, x, y, enemies, enemy_lst, all_sprites, bullets):
+    def __init__(self, x, y, enemies, enemy_lst, all_sprites, bullets, laser_sprite):
         super().__init__(x, y, enemies, enemy_lst, all_sprites)
         self.action = 0  # 0-idle 1-going 2-dying 3-defending 4-shoot
         self.animation_list = golem_lst
@@ -90,29 +90,75 @@ class Golem(Enemy):
         self.bullets = bullets
         self.shoot_time = pygame.time.get_ticks()
         self.shooting = False
+        self.laser = False
+        self.laser_time = pygame.time.get_ticks()
+        self.end_laser = pygame.time.get_ticks()
+        self.laser_sprite = laser_sprite
+        self.flag = False
+        self.strike_laser = False
 
     def updater(self, direction_x, direction_y):
+
         try:
             super().updater(direction_x, direction_y)
         except Exception:
             print(self.action, self.frame_index)
-        if pygame.time.get_ticks() - self.shoot_time >= 5000 and self.action != 2:
+        if pygame.time.get_ticks() - self.laser_time >= 5000 and self.action != 2 and not self.shooting:
+            self.shooting = False
+            self.moving = False
+            self.laser_time = pygame.time.get_ticks()
+            self.laser = True
+            self.bullet = self.shoot_laser(0, self.rect.x + self.rect.w // 2, self.rect.y + self.rect.h // 2, laser_start, self.laser_sprite)
+        if self.laser:
+            if self.bullet.frame_index == 5:
+                self.all_sprites.remove(self.bullet)
+                self.laser_sprite.empty()
+                self.flag = True
+        if self.flag:
+            self.bullet = self.shoot_laser(0, direction_x, direction_y, laser_strike,
+                             self.laser_sprite)
+            self.end_laser = pygame.time.get_ticks()
+            self.flag = False
+            self.strike_laser = True
+            self.laser = False
+        if pygame.time.get_ticks() - self.end_laser >= 1500 and self.strike_laser:
+            self.laser_time = pygame.time.get_ticks()
+            self.all_sprites.remove(self.bullet)
+            self.laser_sprite.empty()
+            self.moving = True
+            self.strike_laser = False
+
+
+        if pygame.time.get_ticks() - self.shoot_time >= 1500 and self.action != 2 and not self.laser and not self.strike_laser:
             self.shooting = True
             self.moving = False
+            self.laser = False
             self.shoot_time = pygame.time.get_ticks()
         if self.shooting:
             self.action = 4
         if self.action == 4 and self.frame_index == 8:
-            self.shoot(direction_x, direction_y)
+            self.shoot(2, direction_x, direction_y, shoot_list1, self.bullets)
+            self.shoot_time = pygame.time.get_ticks()
             self.shooting = False
             self.moving = True
             self.frame_index = 0
 
 
-    def shoot(self, direction_x, direction_y):
-        bullet = Projectile(10, self.rect.x, self.rect.y, direction_x, direction_y, shoot_list1)
+    def shoot(self, vel, direction_x, direction_y, sprite_list, bullets_type):
+        if not self.facing:
+            bullet = Projectile(vel, self.rect.x, self.rect.y + self.rect.y * 0.1, direction_x, direction_y - self.rect.y * 0.1, sprite_list)
+        else:
+            bullet = Projectile(vel, self.rect.x + self.rect.width, self.rect.y + self.rect.y * 0.1, direction_x, direction_y - self.rect.y * 0.1, sprite_list)
         self.all_sprites.add(bullet)
-        self.bullets.add(bullet)
+        bullets_type.add(bullet)
+        return bullet
+
+    def shoot_laser(self, vel, direction_x, direction_y, sprite_list, bullets_type):
+        # bullet = Projectile(vel, self.rect.x, self.rect.y, direction_x, direction_y, sprite_list)
+        bullet = Projectile(vel, self.rect.x, self.rect.y + self.rect.y * 0.1, direction_x, direction_y - self.rect.y * 0.1, sprite_list)
+        self.all_sprites.add(bullet)
+        bullets_type.add(bullet)
+        return bullet
 
 
 
@@ -148,7 +194,16 @@ shoot_list = spritesheet.get_animation(shoot, 77, 49, BLACK, 9, 6, 0)
 
 sprite_sheet_idle = pygame.image.load('sprites/GolemArm.png').convert_alpha()
 shoot = spritesheet.Spritesheet(sprite_sheet_idle)
-shoot_list1 = spritesheet.get_animation(shoot, 35, 14, BLACK, 6, 3, 0)
+shoot_list1 = spritesheet.get_animation(shoot, 35, 14, BLACK, 6, 6, 0)
+
+sprite_sheet_idle = pygame.image.load('sprites/Shoot1.png').convert_alpha()
+laser = spritesheet.Spritesheet(sprite_sheet_idle)
+laser_start = spritesheet.get_animation(laser, 36, 39, BLACK, 8, 3, 0)
+
+sprite_sheet_idle = pygame.image.load('sprites/Shoot2.png').convert_alpha()
+laser_go = spritesheet.Spritesheet(sprite_sheet_idle)
+laser_strike = spritesheet.get_animation(laser_go, 272, 48, (255, 255, 255), 6, 4, 0)
+
 
 
 

@@ -59,11 +59,14 @@ class Game:
                     sys.exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    enemy = Enemy(self.level.hero.rect.x, self.level.hero.rect.y, self.level.enemies, self.level.enemies_lst)
-                    self.level.visible_sprites.add(enemy)
-                    self.level.enemies.add(enemy)
-                    self.level.enemies_lst.append(enemy)
+                # if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                #     enemy = Enemy(self.level.hero.rect.x, self.level.hero.rect.y, self.level.enemies, self.level.enemies_lst)
+                #     self.level.visible_sprites.add(enemy)
+                #     self.level.enemies.add(enemy)
+                #     self.level.enemies_lst.append(enemy)
+
+            if self.level.hero.hp <= 0:
+                sys.exit()
 
             self.screen.blit(self.bg, (0, i))
             self.screen.blit(self.bg, (0, HEIGHT + i))

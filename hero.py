@@ -32,6 +32,8 @@ class Hero(pygame.sprite.Sprite):
         self.help_x = 0
         self.help_y = 0
         self.damage = 10
+        self.hp = 100
+        self.max_hp = 100
 
 
     def update(self):
@@ -99,6 +101,7 @@ class Hero(pygame.sprite.Sprite):
                                 self.aim.rect.y + self.help_y + self.aim.rect.y * 0.02, fire_bullet, 90)
         group_of_sprite.add(bullet)
         bullets_sprite.add(bullet)
+
 
 
 class Aim(pygame.sprite.Sprite):

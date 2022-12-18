@@ -5,7 +5,7 @@ pygame.init()
 
 
 class Bar(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, hero):
         pygame.sprite.Sprite.__init__(self)
 
 
@@ -16,6 +16,11 @@ class Bar(pygame.sprite.Sprite):
             self.sprites.append(img)
         self.image = self.sprites[15]
         self.rect = self.image.get_rect()
+        self.hero = hero
+
+    def update(self):
+        num = int((len(self.sprites) - 1) * self.hero.hp / self.hero.max_hp)
+        self.image = self.sprites[num]
 
 
     def draw(self, x, y, screen):

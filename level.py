@@ -25,10 +25,13 @@ class Level:
         self.earth.rect.y = 100
         self.enemies = pygame.sprite.Group()
         self.enemies_lst = []
-
+        self.hero_group = pygame.sprite.Group()
         self.golem_bullets = pygame.sprite.Group()
+        self.laser = pygame.sprite.Group()
         self.create_map()
         self.screen = screen
+
+
 
 
     def run(self):
@@ -39,6 +42,9 @@ class Level:
 
         pygame.sprite.groupcollide(self.golem_bullets, self.tiles, True, False)
 
+        if pygame.sprite.groupcollide(self.golem_bullets, self.hero_group, True, False):
+            self.hero.hp -= 5
+
         for i in pygame.sprite.groupcollide(self.bullets, self.enemies, True, False).items():
             i[1][0].hp -= self.hero.damage
 
@@ -47,6 +53,7 @@ class Level:
 
 
         self.visible_sprites.custom_draw(self.hero)
+        self.bar.update()
         self.bar.draw(WIDTH * 0.01, HEIGHT * 0.01, self.screen)
 
 
@@ -69,17 +76,17 @@ class Level:
                     self.half_height = self.display_surface.get_size()[1] // 2
 
                     self.aim = Aim(0, 0)
-                    self.hero = Hero(3, 3, 0, self.visible_sprites, self.bullets, self.tiles, x + 100, y + 100, self.aim)
+                    self.hero = Hero(6, 6, 0, self.visible_sprites, self.bullets, self.tiles, x + 100, y + 100, self.aim)
                     self.aim.x = self.hero.rect.centerx - self.half_width
                     self.aim.y = self.hero.rect.centery - self.half_height
 
                     # self.all_sprites.add(self.hero)
                     self.visible_sprites.add(self.aim)
                     self.visible_sprites.add(self.hero)
-                    self.bar = Bar()
+                    self.bar = Bar(self.hero)
+                    self.hero_group.add(self.hero)
                 elif col == 'e':
-                    self.enemy = Golem(x + 100, y + 100, self.enemies, self.enemies_lst, self.visible_sprites, self.golem_bullets)
-                    self.visible_sprites.add(self.enemy)
+                    self.enemy = Golem(x + 100, y + 100, self.enemies, self.enemies_lst, self.visible_sprites, self.golem_bullets, self.laser)
 
 
 class Camera(pygame.sprite.Group):

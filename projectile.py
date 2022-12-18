@@ -35,7 +35,7 @@ class Projectile(pygame.sprite.Sprite):
             self.lst[i] = pygame.transform.rotate(self.lst[i], (360 - self.angle * 180 / math.pi) % 360)
             self.lst[i].set_colorkey((0, 0, 0))
 
-            # self.rect = self.lst[i].get_rect(center=self.lst[i].get_rect(center=(x, y)).center)
+            self.rect = self.lst[i].get_rect(center=self.lst[i].get_rect(center=(x, y)).center)
         self.image = self.lst[0]
 
         self.change_x = math.cos(self.angle) * vel
